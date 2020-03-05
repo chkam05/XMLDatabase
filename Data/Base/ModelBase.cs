@@ -81,6 +81,8 @@ namespace XMLDatabase.Data.Base
         }
 
         //  ----------------------------------------------------------------------------------------------------
+        /// <summary> Model Class Instance Constructor with data injection from XML Model. </summary>
+        /// <param name="xmlModel"> XML Model from XML Database. </param>
         public ModelBase(XElement xmlModel)
         {
             //  Get identifier from XML Model.
@@ -97,9 +99,9 @@ namespace XMLDatabase.Data.Base
             //  Get rest of variables from XML Model and load it into Class Model.
             foreach (var xmlVariable in xmlModel.Elements())
             {
-                var name = xmlVariable.Name.ToString().Trim('"');
+                var name = xmlVariable.Name.ToString();
                 var typeAttrib = xmlVariable.Attribute("type");
-                var value = xmlVariable.Value.ToString().Trim('"');
+                var value = xmlVariable.Value.ToString();
 
                 //  Raise error if Value Type Attribute was not loaded from XML Model.
                 if (typeAttrib == null)

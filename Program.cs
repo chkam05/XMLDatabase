@@ -21,27 +21,55 @@ namespace XMLDatabase
         private static void SaveTest()
         {
             Console.WriteLine("Creating Example Model ...");
-            var exampleModel = new ExampleModel
+            var exampleModelList = new List<ExampleModel>
             {
-                BoolVar = false,
-                IntVar = 12345,
-                DoubleVar = 6.54321,
-                StringVar = "Hello World",
-                DateTimeVar = DateTime.UtcNow
+                new ExampleModel
+                {
+                    BoolVar = false,
+                    IntVar = 12345,
+                    DoubleVar = 6.54321,
+                    StringVar = "Hello World",
+                    DateTimeVar = DateTime.UtcNow
+                },
+                new ExampleModel
+                {
+                    BoolVar = true,
+                    IntVar = 67890,
+                    DoubleVar = 0.9876,
+                    StringVar = "Funck Me!",
+                    DateTimeVar = new DateTime(1994, 12, 05, 19, 10, 00)
+                },
+
             };
 
+            var instancesCounter = 1;
+
             Console.WriteLine("Listing of variables in Example Model ...");
-            foreach (var fieldInfo in exampleModel.GetVariables())
+            foreach (var exampleModel in exampleModelList)
             {
-                Console.WriteLine($"({fieldInfo.PropertyType}) {fieldInfo.Name}: {fieldInfo.GetValue(exampleModel)}");
+                Console.WriteLine($"Printing {instancesCounter}/{exampleModelList.Count()} instances of ExampleModel ...");
+                instancesCounter++;
+
+                foreach (var fieldInfo in exampleModel.GetVariables())
+                {
+                    Console.WriteLine($"({fieldInfo.PropertyType}) {fieldInfo.Name}: {fieldInfo.GetValue(exampleModel)}");
+                }
             }
 
             Console.WriteLine("Creating XML database ...");
             var database = XMLDatabaseManager.CreateXMLDatabase(new string[] { "ExampleModel" });
             var dbManager = new XMLDatabaseManager(database);
 
-            Console.WriteLine("Adding Example Model Into XML database ...");
-            dbManager.AddDataModelInstance(exampleModel);
+            instancesCounter = 1;
+
+            foreach (var exampleModel in exampleModelList)
+            {
+                Console.WriteLine($"Adding {instancesCounter}/{exampleModelList.Count()} instance of Example Model into XML database ...");
+                instancesCounter++;
+
+                dbManager.AddDataModelInstance(exampleModel);
+                dbManager.UpdateDataModelInstance(exampleModel);
+            }
 
             Console.WriteLine("Saving database to file ...");
             XMLDatabaseFileManager.SaveXMLDatabaseToFile(database, filePath);
@@ -71,6 +99,7 @@ namespace XMLDatabase
 
                     var exampleModel = new ExampleModel(xmlModel);
                     exampleModelList.Add(exampleModel);
+                    var testModel = dbManager.GetDataModelInstance<ExampleModel>(exampleModel.GetIdentifier());
                 }
             }
 

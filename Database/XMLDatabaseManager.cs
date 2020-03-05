@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Xml.Linq;
 using XMLDatabase.Data.Base;
@@ -29,7 +30,7 @@ namespace XMLDatabase.Database
         public static XElement CreateXMLDatabase( string[] dataModelsNames = null )
         {
             //  Create empty XML Database Root element.
-            var xmlDatabase = new XElement("ROOT");
+            var xmlDatabase = new XElement("XMLDatabase");
 
             //  Fill XML Database with Names of Data Models from list if exsit.
             if (dataModelsNames != null)
@@ -50,15 +51,34 @@ namespace XMLDatabase.Database
         #region DATABASE MANAGEMENT FUNCTIONS
 
         //  ----------------------------------------------------------------------------------------------------
-        public void GetDataModelInstance()
+        public T GetDataModelInstance<T>(string identifier)
         {
-            //
+            //  Check if generic input Type is a type of Model Class interface.
+            if (typeof(IModel).IsAssignableFrom(typeof(T)))
+            {
+                //  If database contains Node for specified Model Class - add model into database.
+                if (HasDataModelInstanceKey(typeof(T).Name))
+                {
+                    var targetNode = database.Elements(typeof(T).Name);
+                    var xmlModels = targetNode.Elements(typeof(T).Name).Where(
+                        item => item.Attribute("id").Value == identifier);
+
+                    //  If result from database is not null and contains XML Model.
+                    if (xmlModels != null && xmlModels.Count() > 0)
+                    {
+                        T result = (T) Activator.CreateInstance(typeof(T), new object[] { xmlModels.FirstOrDefault() });
+                        return result;
+                    }
+                }
+            }
+
+            return default(T);
         }
 
         //  ----------------------------------------------------------------------------------------------------
-        public void GetDataModelInstances()
+        public List<T> GetDataModelInstances<T>(Expression<Func<T, bool>> predicate)
         {
-            //
+            return null;
         }
 
         //  ----------------------------------------------------------------------------------------------------
@@ -77,9 +97,17 @@ namespace XMLDatabase.Database
         //  ----------------------------------------------------------------------------------------------------
         public void UpdateDataModelInstance(IModel dataModel)
         {
+            //  If database contains Node for specified Model Class - get Node.
             if (HasDataModelInstanceKey(dataModel.GetName()))
             {
-                //
+                var targetNode = database.Element(dataModel.GetName());
+
+                //  Get XML Database element based on "id" attribute.
+                var xmlModels = database.Elements(dataModel.GetName()).Where(
+                    item => item.Attribute("id").Value == dataModel.GetIdentifier());
+
+                Console.WriteLine(targetNode);
+                Console.WriteLine(xmlModels);
             }
         }
 
