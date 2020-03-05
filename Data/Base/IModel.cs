@@ -13,6 +13,7 @@ namespace XMLDatabase.Data.Base
 
         PropertyInfo[] GetVariables();
         void SetVariable<T>(string name, T value);
+        void TrySetVariable(string name, object value);
         string GetName();
 
         #endregion CLASS MANAGEMENT FUNCTIONS
@@ -21,6 +22,7 @@ namespace XMLDatabase.Data.Base
         #region MODEL MANAGEMENT FUNCTIONS
 
         string GetIdentifier();
+        void ForceNewIdentifier();
         void SetIdentifier(string identifier);
 
         #endregion MODEL MANAGEMENT FUNCTIONS
